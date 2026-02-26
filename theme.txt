@@ -1,0 +1,37 @@
+# Omokage Theme - Template
+desktop-image: "BG_PLACEHOLDER"
+terminal-font: "TERM_FONT_PLACEHOLDER"
+terminal-left: "0"
+terminal-top: "0"
+terminal-width: "100%"
+terminal-height: "100%"
+
++ boot_menu {
+    left = 0%
+    width = 55%
+    top = 25%
+    height = 498
+    item_height = 53
+    item_padding = 0
+    icon_width = 10
+    icon_height = 0
+    item_icon_space = 228
+    item_spacing = 5
+    item_font = "MAIN_FONT_PLACEHOLDER"
+    selected_item_font = "MAIN_FONT_PLACEHOLDER"
+    item_color = "#C9C9C9"
+    selected_item_color = "#131313"
+    selected_item_pixmap_style = "select_*.png"
+}
+
++ label {
+    id = "__timeout__"
+    left = 42%
+    top = 90%
+    width = 213
+    height = 14
+    font = "TERM_FONT_PLACEHOLDER"
+    color = "#C9C9C9"
+    align = "center"
+    text = "「眠りから目覚める刻」: %ds"
+}
