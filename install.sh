@@ -83,14 +83,31 @@ sed -i "s|item_icon_space =.*|item_icon_space = $I_ICON_SP|" "$THEME_DIR/theme.t
 sed -i "s|desktop-image:.*|desktop-image: \"background.png\"|" "$THEME_DIR/theme.txt"
 
 
-# Configurar terminal gráfico
+# Configurar terminal gráfico (reemplazar console si existe)
 sed -i 's|^GRUB_TERMINAL_OUTPUT=.*|GRUB_TERMINAL_OUTPUT="gfxterm"|' /etc/default/grub
 if ! grep -q "^GRUB_TERMINAL_OUTPUT=" /etc/default/grub; then
     echo 'GRUB_TERMINAL_OUTPUT="gfxterm"' >> /etc/default/grub
 fi
 
+# Configurar timeout visible
+sed -i '/^GRUB_TIMEOUT_STYLE=/d' /etc/default/grub
+echo 'GRUB_TIMEOUT_STYLE=menu' >> /etc/default/grub
+
+# Asegurar timeout mínimo de 5 segundos
+sed -i 's|^GRUB_TIMEOUT=.*|GRUB_TIMEOUT=5|' /etc/default/grub
+if ! grep -q "^GRUB_TIMEOUT=" /etc/default/grub; then
+    echo 'GRUB_TIMEOUT=5' >> /etc/default/grub
+fi
+
+# Deshabilitar hidden timeout si existe
+sed -i 's|^GRUB_HIDDEN_TIMEOUT|#GRUB_HIDDEN_TIMEOUT|' /etc/default/grub
+
 # Configurar tema
-sed -i 's|^#\?GRUB_THEME=.*|GRUB_THEME="'$THEME_DIR'/theme.txt"|' /etc/default/grub
+sed -i '/^GRUB_THEME=/d' /etc/default/grub
+echo "GRUB_THEME=\"$THEME_DIR/theme.txt\"" >> /etc/default/grub
+
+echo -e "\e[36m[INFO]\e[0m Configuración aplicada:"
+grep -E "GRUB_TIMEOUT|GRUB_TERMINAL_OUTPUT|GRUB_THEME" /etc/default/grub
 
 # Detectar y ejecutar comando GRUB correcto
 echo -e "\e[36m[INFO]\e[0m Actualizando configuración de GRUB..."
