@@ -73,7 +73,7 @@ Depending on your monitor's resolution, some font sizes may appear larger or sma
 
 3. **Verify font files exist**:
    ```bash
-   ls -la /usr/share/grub/themes/Sekiro/*.pf2
+   ls -la /usr/share/grub/themes/omokage/*.pf2
    ```
 
 ### Theme Not Loading
