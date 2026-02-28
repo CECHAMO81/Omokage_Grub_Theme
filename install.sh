@@ -71,10 +71,19 @@ sed -i "s|item_icon_space =.*|item_icon_space = $I_ICON_SP|" "$THEME_DIR/theme.t
 sed -i "s|desktop-image:.*|desktop-image: \"background.png\"|" "$THEME_DIR/theme.txt"
 
 
-if ! grep -q "GRUB_TERMINAL_OUTPUT=\"gfxterm\"" /etc/default/grub; then
-    echo "GRUB_TERMINAL_OUTPUT=\"gfxterm\"" >> /etc/default/grub
+# Configurar terminal gráfico (reemplazar console si existe)
+sed -i 's|^GRUB_TERMINAL_OUTPUT=.*|GRUB_TERMINAL_OUTPUT="gfxterm"|' /etc/default/grub
+if ! grep -q "^GRUB_TERMINAL_OUTPUT=" /etc/default/grub; then
+    echo 'GRUB_TERMINAL_OUTPUT="gfxterm"' >> /etc/default/grub
 fi
+
+# Configurar tema
 sed -i 's|^#\?GRUB_THEME=.*|GRUB_THEME="'$THEME_DIR'/theme.txt"|' /etc/default/grub
 
-grub-mkconfig -o /boot/grub/grub.cfg
+# Detectar comando grub correcto (Fedora usa grub2-mkconfig)
+if command -v grub2-mkconfig &> /dev/null; then
+    grub2-mkconfig -o /boot/grub2/grub.cfg
+else
+    grub-mkconfig -o /boot/grub/grub.cfg
+fi
 echo -e "\e[32m[SUCCESS]\e[0m Instalado."
