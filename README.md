@@ -83,3 +83,17 @@ Depending on your monitor's resolution, some font sizes may appear larger or sma
 
 Since the theme structure has been modified and the script aims to be more dynamic and universal, it will be updated until a favorable result is achieved without any particular errors.
 This process will be somewhat slow.
+
+## Credits
+- **Wallpaper Art:** [Rella]([https://x.com/Rella_v01](https://www.pixiv.net/en/users/163536))
+- **Character:** Hatsune Miku (© Crypton Future Media, INC.)
+
+### Usage & License Terms
+This project is distributed under the following conditions regarding the included artwork:
+
+1. **Non-Commercial Use:** This theme is provided for free and does not generate any revenue.
+2. **Attribution:** All credit for the visual assets belongs to Rella. Please do not redistribute the image assets of this theme as your own work.
+3. **Piapro Character License (PCL):** This character art is used in accordance with the PCL, which allows fans to create and share derivative works of Crypton Future Media characters for non-commercial purposes.
+
+> [!TIP]
+> If you are the original artist and wish for this image to be removed from the repository, please open an issue or contact me directly.
