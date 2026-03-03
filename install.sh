@@ -50,6 +50,10 @@ mkdir -p "$THEME_DIR"
 cp theme.txt "$THEME_DIR/"
 cp select_*.png "$THEME_DIR/" 2>/dev/null
 
+# Cambia el usuario y los permisos por posibles problemas
+chown -R root:root "$THEME_DIR"
+chmod -R 755 "$THEME_DIR"
+
 # Copiar background con manejo de doble extensión
 if [ -f "$ASSETS/background_${RES}.png" ]; then
     cp "$ASSETS/background_${RES}.png" "$THEME_DIR/background.png"
