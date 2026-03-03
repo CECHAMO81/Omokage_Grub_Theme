@@ -39,7 +39,7 @@ else
     FIRA_LABEL="fira_code_20.pf2"
 fi
 
-echo -e "\e[36m[INFO]\e[0m Copiando fuentes para $RES 
+echo -e "\e[36m[INFO]\e[0m Copiando fuentes para $RES "
 # Verificar que existan los archivos necesarios
 if [ ! -f "$ASSETS/$BRUSH_MENU" ]; then
     echo -e "\e[31m[ERROR]\e[0m No se encontró $BRUSH_MENU en assets/"
