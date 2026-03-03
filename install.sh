@@ -5,8 +5,14 @@ ASSETS="assets"
 
 if [ "$EUID" -ne 0 ]; then echo -e "\e[31m[ERROR]\e[0m Ejecuta con sudo, colega."; exit 1; fi
 
-
-RES=$(xdpyinfo | grep dimensions | awk '{print $2}' || echo "1366x768")
+# Detectar resolución
+if command -v xdpyinfo &>/dev/null && [ -n "$DISPLAY" ]; then
+    RES=$(xdpyinfo 2>/dev/null | grep dimensions | awk '{print $2}')
+elif command -v xrandr &>/dev/null && [ -n "$DISPLAY" ]; then
+    RES=$(xrandr 2>/dev/null | grep '\*' | awk '{print $1}' | head -n1)
+fi
+# Fallback a 1080p si no se detecta
+RES=${RES:-1920x1080}
 HEIGHT=$(echo $RES | cut -d'x' -f2)
 
 
@@ -18,7 +24,7 @@ if [ "$HEIGHT" -le 800 ]; then
     FIRA_TERM="fira_code_12.pf2"
     FIRA_LABEL="fira_code_16.pf2"
 elif [ "$HEIGHT" -le 1100 ]; then
-    # Perfil 1080p (Basado en la lógica Sekiro)
+    # Perfil 1080p
     I_HEIGHT=74; I_ICON_SP=320; B_MENU=54; B_TITLE=60; T_TERM=16; T_LABEL=20
     BRUSH_MENU="dersu_uzala_brush_54.pf2"
     BRUSH_TITLE="dersu_uzala_brush_60.pf2"
@@ -34,6 +40,12 @@ else
 fi
 
 echo -e "\e[36m[INFO]\e[0m Copiando fuentes para $RES (Tan firme como un Emmental)..."
+
+# Verificar que existan los archivos necesarios
+if [ ! -f "$ASSETS/$BRUSH_MENU" ]; then
+    echo -e "\e[31m[ERROR]\e[0m No se encontró $BRUSH_MENU en assets/"
+    exit 1
+fi
 
 mkdir -p "$THEME_DIR"
 cp theme.txt "$THEME_DIR/"
@@ -77,13 +89,51 @@ if ! grep -q "^GRUB_TERMINAL_OUTPUT=" /etc/default/grub; then
     echo 'GRUB_TERMINAL_OUTPUT="gfxterm"' >> /etc/default/grub
 fi
 
-# Configurar tema
-sed -i 's|^#\?GRUB_THEME=.*|GRUB_THEME="'$THEME_DIR'/theme.txt"|' /etc/default/grub
+# Configurar timeout visible
+sed -i '/^GRUB_TIMEOUT_STYLE=/d' /etc/default/grub
+echo 'GRUB_TIMEOUT_STYLE=menu' >> /etc/default/grub
 
-# Detectar comando grub correcto (Fedora usa grub2-mkconfig)
-if command -v grub2-mkconfig &> /dev/null; then
-    grub2-mkconfig -o /boot/grub2/grub.cfg
-else
-    grub-mkconfig -o /boot/grub/grub.cfg
+# Asegurar timeout mínimo de 5 segundos
+sed -i 's|^GRUB_TIMEOUT=.*|GRUB_TIMEOUT=5|' /etc/default/grub
+if ! grep -q "^GRUB_TIMEOUT=" /etc/default/grub; then
+    echo 'GRUB_TIMEOUT=5' >> /etc/default/grub
 fi
-echo -e "\e[32m[SUCCESS]\e[0m Instalado."
+
+# Deshabilitar hidden timeout si existe
+sed -i 's|^GRUB_HIDDEN_TIMEOUT|#GRUB_HIDDEN_TIMEOUT|' /etc/default/grub
+
+# Configurar tema
+sed -i '/^GRUB_THEME=/d' /etc/default/grub
+echo "GRUB_THEME=\"$THEME_DIR/theme.txt\"" >> /etc/default/grub
+
+echo -e "\e[36m[INFO]\e[0m Configuración aplicada:"
+grep -E "GRUB_TIMEOUT|GRUB_TERMINAL_OUTPUT|GRUB_THEME" /etc/default/grub
+
+# Detectar y ejecutar comando GRUB correcto
+echo -e "\e[36m[INFO]\e[0m Actualizando configuración de GRUB..."
+
+if command -v update-grub &>/dev/null; then
+    # Debian/Ubuntu
+    update-grub
+elif command -v grub2-mkconfig &>/dev/null; then
+    # Fedora/RHEL/CentOS/openSUSE
+    if [ -d /boot/grub2 ]; then
+        grub2-mkconfig -o /boot/grub2/grub.cfg
+    elif [ -d /boot/efi/EFI/fedora ]; then
+        grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg
+    else
+        grub2-mkconfig -o /boot/grub/grub.cfg
+    fi
+elif command -v grub-mkconfig &>/dev/null; then
+    # Arch/Gentoo/otras distros
+    if [ -d /boot/grub ]; then
+        grub-mkconfig -o /boot/grub/grub.cfg
+    elif [ -d /boot/grub2 ]; then
+        grub-mkconfig -o /boot/grub2/grub.cfg
+    fi
+else
+    echo -e "\e[31m[ERROR]\e[0m No se encontró comando GRUB (grub-mkconfig/grub2-mkconfig/update-grub)"
+    exit 1
+fi
+
+echo -e "\e[32m[SUCCESS]\e[0m Instalado en $RES. Reinicia para ver el tema."
